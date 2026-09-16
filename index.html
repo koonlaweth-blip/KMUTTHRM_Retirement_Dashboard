@@ -5,20 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard คาดการณ์ผู้เกษียณอายุ</title>
     
-    <!-- 1. นำเข้า Tailwind CSS สำหรับตกแต่งความสวยงาม -->
+    <!-- นำเข้า Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- 2. นำเข้า React -->
+    <!-- นำเข้า React -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- 3. นำเข้า Babel สำหรับแปลงโค้ด JSX -->
+    <!-- นำเข้า Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- 4. นำเข้า SheetJS สำหรับอ่านไฟล์ Excel -->
+    <!-- นำเข้า SheetJS สำหรับอ่านไฟล์ Excel -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     
-    <!-- 5. นำเข้า Recharts สำหรับวาดกราฟ -->
+    <!-- นำเข้า Recharts สำหรับวาดกราฟ -->
     <script src="https://unpkg.com/prop-types/prop-types.min.js"></script>
     <script src="https://unpkg.com/recharts/umd/Recharts.js"></script>
 </head>
@@ -40,8 +40,8 @@
             useEffect(() => {
                 const fetchData = async () => {
                     try {
-                        // ดึงไฟล์ Excel ที่อยู่ในโฟลเดอร์เดียวกัน
-                        const response = await fetch('./BPHRM-ผู้เกษียณอายุ ณ 31 ส.ค. 69.xlsx');
+                        // เปลี่ยนชื่อไฟล์ตรงนี้เป็น Data.xlsx
+                        const response = await fetch('./Data.xlsx');
                         if (!response.ok) throw new Error('ไม่พบไฟล์ Excel');
                         
                         const arrayBuffer = await response.arrayBuffer();
@@ -56,7 +56,7 @@
                         setLoading(false);
                     } catch (err) {
                         console.error(err);
-                        setError('ไม่สามารถอ่านไฟล์ได้ (หากดับเบิ้ลคลิกเปิดไฟล์ .html จากเครื่องโดยตรง เบราว์เซอร์จะบล็อกการอ่านไฟล์ แนะนำให้อัปโหลดขึ้น GitHub แล้วดูผลลัพธ์บนเว็บ)');
+                        setError('ไม่สามารถอ่านไฟล์ Data.xlsx ได้ กรุณาตรวจสอบว่ามีไฟล์นี้อยู่ในระดับเดียวกับ index.html');
                         setLoading(false);
                     }
                 };
@@ -78,7 +78,7 @@
                 const counts = {};
                 filteredData.forEach(item => {
                     const year = item['ปีเกษียณ'];
-                    if (year && year <= 2579) {
+                    if (year && year <= 2579) { // 10 ปีล่วงหน้า
                         counts[year] = (counts[year] || 0) + 1;
                     }
                 });
