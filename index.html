@@ -12,6 +12,9 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
+    <!-- *** จุดที่แก้ไข: เพิ่มไลบรารี react-is ที่ Recharts ต้องการ *** -->
+    <script crossorigin src="https://unpkg.com/react-is@18/umd/react-is.production.min.js"></script>
+    
     <!-- นำเข้า Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
@@ -27,7 +30,8 @@
 
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
-        const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } = window.Recharts;
+        // หาก Recharts โหลดสำเร็จ จะสามารถดึง BarChart มาใช้ได้
+        const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } = window.Recharts || {};
 
         const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
@@ -40,7 +44,6 @@
             useEffect(() => {
                 const fetchData = async () => {
                     try {
-                        // เปลี่ยนชื่อไฟล์ตรงนี้เป็น Data.xlsx
                         const response = await fetch('./Data.xlsx');
                         if (!response.ok) throw new Error('ไม่พบไฟล์ Excel');
                         
@@ -50,7 +53,6 @@
                         const worksheet = workbook.Sheets[firstSheetName];
                         const jsonData = XLSX.utils.sheet_to_json(worksheet);
                         
-                        // กรองข้อมูลเฉพาะปี 2569 เป็นต้นไป
                         const futureRetirees = jsonData.filter(row => row['ปีเกษียณ'] >= 2569);
                         setData(futureRetirees);
                         setLoading(false);
@@ -78,7 +80,7 @@
                 const counts = {};
                 filteredData.forEach(item => {
                     const year = item['ปีเกษียณ'];
-                    if (year && year <= 2579) { // 10 ปีล่วงหน้า
+                    if (year && year <= 2579) {
                         counts[year] = (counts[year] || 0) + 1;
                     }
                 });
@@ -102,6 +104,9 @@
 
             if (error) return <div className="p-10 text-red-500 font-bold text-center">{error}</div>;
             if (loading) return <div className="p-10 text-center text-xl">กำลังโหลดข้อมูล...</div>;
+
+            // ตรวจสอบว่าโหลดกราฟสำเร็จหรือไม่
+            if (!BarChart) return <div className="p-10 text-red-500 font-bold text-center">เกิดข้อผิดพลาดในการโหลดไลบรารีกราฟ</div>;
 
             return (
                 <div className="p-6 max-w-7xl mx-auto min-h-screen">
